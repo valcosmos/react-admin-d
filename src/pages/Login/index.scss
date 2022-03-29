@@ -1,0 +1,21 @@
+.login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-image: url(https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg);
+  background-repeat: no-repeat no-repeat;
+  background-position: center center;
+  background-size: 100%;
+}
+
+.login-container {
+  width: 440px;
+}
+
+.login-logo {
+  width: 80px;
+  display: block;
+  margin: 0 auto 20px;
+}

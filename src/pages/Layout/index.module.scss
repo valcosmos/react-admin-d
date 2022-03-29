@@ -1,0 +1,32 @@
+.layout {
+  height: 100vh;
+
+  :global {
+    .ant-layout {
+      height: 100%;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      .logo {
+        // float: left;
+        width: 30px;
+        height: 30px;
+        margin: 16px 24px 16px 0;
+        background-image: url(https://www.valzt.cn/media/avatar_me.png);
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+      .profile {
+        color: #fff;
+        .userName {
+          margin-right: 20px;
+        }
+      }
+    }
+    .content {
+      background-color: #fff;
+      padding: 20px;
+    }
+  }
+}

@@ -1,8 +1,9 @@
-import React, { Component, useState } from 'react'
+import React, { useState } from 'react'
 import { Card, Form, Input, Checkbox, Button, message } from 'antd'
-import './index.scss'
+import style from './index.module.scss'
 import { login } from 'api/user'
 import { useNavigate } from 'react-router'
+import { setToken } from 'utils/storage'
 export const Login = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
@@ -12,12 +13,11 @@ export const Login = () => {
     setLoading(true)
     try {
       const { data } = await login(mobile, code)
-      localStorage.setItem('token', data.token)
+      setToken(data.token)
       // this.props.history.push('/home')
       navigate('/home')
-      message.success('登陆成功', 1, () => {
-        setLoading(false)
-      })
+      message.success('登陆成功', 1, () => {})
+      await setLoading(false)
     } catch (err) {
       message.error(err.response.data.message, 1, () => {
         setLoading(false)
@@ -30,10 +30,10 @@ export const Login = () => {
   }
 
   return (
-    <div className="login">
-      <Card className="login-container">
+    <div className={style.login}>
+      <Card className={style['login-container']}>
         <img
-          className="login-logo"
+          className={style['login-logo']}
           src={'https://www.valzt.cn/media/avatar_me.png'}
           alt=""
         />

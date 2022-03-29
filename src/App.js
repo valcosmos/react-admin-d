@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Home from './pages/Layout'
-import Login from './pages/Login'
+import { Login } from './pages/Login'
+import { NotFound } from './pages/NotFound'
 function App() {
   return (
     <Router>
@@ -12,6 +13,7 @@ function App() {
           <Route path="/home" element={<Home />}></Route>
           <Route path="/login" element={<Login />}></Route>
           {/* 配置404组件 */}
+          <Route path="*" element={<NotFound />}></Route>
         </Routes>
       </div>
     </Router>

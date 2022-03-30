@@ -4,20 +4,22 @@ import style from './index.module.scss'
 import { login } from 'api/user'
 import { useNavigate } from 'react-router'
 import { setToken } from 'utils/storage'
+import { useAuth } from 'components/AuthRoute/AuthProvider'
+
 export const Login = () => {
   const navigate = useNavigate()
+  const auth = useAuth()
   const [loading, setLoading] = useState(false)
   const onFinish = async (values) => {
     console.log('Success:', values)
-    const { mobile, code } = values
     setLoading(true)
+    const { mobile, code } = values
     try {
       const { data } = await login(mobile, code)
-      setToken(data.token)
-      // this.props.history.push('/home')
-      navigate('/home')
-      message.success('登陆成功', 1, () => {})
-      await setLoading(false)
+      auth.signin(data.token, () => navigate('/home', { replace: true }))
+      message.success('登陆成功', 1, () => {
+        setLoading(false)
+      })
     } catch (err) {
       message.error(err.response.data.message, 1, () => {
         setLoading(false)

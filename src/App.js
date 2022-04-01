@@ -1,9 +1,13 @@
 import {
-  BrowserRouter as Router,
+  // BrowserRouter as Router,
+  Router,
   Route,
   Routes,
   Navigate
 } from 'react-router-dom'
+
+import { useState, useLayoutEffect } from 'react'
+
 import Layout from './pages/Layout'
 import { Login } from './pages/Login'
 import { NotFound } from './pages/NotFound'
@@ -12,9 +16,28 @@ import ArticlePublish from 'pages/ArticlePublish'
 import Home from 'pages/Home'
 import { AuthProvider } from 'components/AuthRoute/AuthProvider'
 import { RequireAuth } from 'components/AuthRoute/RequireAuth'
+import history from 'utils/history'
 function App() {
+  const CustomRouter = ({ history, ...props }) => {
+    const [state, setState] = useState({
+      action: history.action,
+      location: history.location
+    })
+
+    useLayoutEffect(() => history.listen(setState), [history])
+
+    return (
+      <Router
+        {...props}
+        location={state.location}
+        navigationType={state.action}
+        navigator={history}
+      />
+    )
+  }
   return (
-    <Router>
+    // <Router history={history}>
+    <CustomRouter history={history}>
       <div className="App">
         <AuthProvider>
           {/* <Link to={'/login'}>登陆</Link>
@@ -40,7 +63,8 @@ function App() {
           </Routes>
         </AuthProvider>
       </div>
-    </Router>
+      {/* </Router> */}
+    </CustomRouter>
   )
 }
 

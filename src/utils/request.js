@@ -1,4 +1,9 @@
+import { message } from 'antd'
 import axios from 'axios'
+import { Navigate, Location, useNavigate } from 'react-router-dom'
+import { getToken, hasToken, removeToken } from './storage'
+import history from './history'
+import { useAuth } from 'components/AuthRoute/AuthProvider'
 
 const instance = axios.create({
   baseURL: 'http://geek.itheima.net/v1_0',
@@ -7,15 +12,31 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
+    if (hasToken()) {
+      config.headers.Authorization = `Bearer ${getToken()}`
+    }
     return config
   },
   (err) => Promise.reject(err)
 )
 
 instance.interceptors.response.use(
-  (resposnse) => {
-    return resposnse.data
+  (response) => {
+    console.log(history)
+    return response.data
   },
-  (err) => Promise.reject(err)
+  (err) => {
+    // 如果token过期
+    if (err.response.status === 401) {
+      // 删除
+      // removeToken()
+      message.warn('登陆信息过期')
+
+      // 跳转到登陆页面
+      // window.location.href = '/login'
+      history.push('/')
+    }
+    return Promise.reject(err)
+  }
 )
 export default instance

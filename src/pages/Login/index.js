@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, Form, Input, Checkbox, Button, message } from 'antd'
 import style from './index.module.scss'
 import { login } from 'api/user'
@@ -10,6 +10,7 @@ export const Login = () => {
   const navigate = useNavigate()
   const auth = useAuth()
   const [loading, setLoading] = useState(false)
+
   const onFinish = async (values) => {
     console.log('Success:', values)
     setLoading(true)

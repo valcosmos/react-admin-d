@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, componentDidMount, useEffect } from 'react'
 import style from './index.module.scss'
 import { Layout, Menu, Popconfirm, Button, message } from 'antd'
 import {
@@ -7,16 +7,32 @@ import {
   SendOutlined,
   LogoutOutlined
 } from '@ant-design/icons'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { removeToken } from 'utils/storage'
+import { getUserProfile } from 'api/user'
 
-const LayoutComponent = () => {
+const LayoutComponent = (props) => {
+  const use = useLocation()
+
+  const [state, setState] = useState({
+    profile: {}
+  })
   const nav = useNavigate()
   const onConfirm = () => {
     removeToken()
     nav('/login')
     message.success('您已退出登陆')
   }
+  const getFile = async () => {
+    const res = await getUserProfile()
+    console.log(res)
+    setState({
+      profile: res.data
+    })
+  }
+  useEffect(() => {
+    getFile()
+  }, [])
 
   return (
     <div className={style.layout}>
@@ -24,7 +40,7 @@ const LayoutComponent = () => {
         <Layout.Header className="header">
           <div className="logo" />
           <div className="profile">
-            <span className="userName">用户名</span>
+            <span className="userName">{state.profile.name}</span>
             <Popconfirm
               title="您确认退出登陆吗？"
               onConfirm={onConfirm}
@@ -42,17 +58,16 @@ const LayoutComponent = () => {
             <Menu
               mode="inline"
               theme="dark"
-              defaultSelectedKeys={['1']}
-              defaultOpenKeys={['sub1']}
+              defaultSelectedKeys={use.pathname}
               style={{ height: '100%', borderRight: 0 }}
             >
-              <Menu.Item icon={<DatabaseOutlined />} key="1">
+              <Menu.Item icon={<DatabaseOutlined />} key="/home">
                 <Link to={'/home'}>数据概览</Link>
               </Menu.Item>
-              <Menu.Item icon={<FilePptOutlined />} key="2">
+              <Menu.Item icon={<FilePptOutlined />} key="/home/list">
                 <Link to={'/home/list'}> 内容管理</Link>
               </Menu.Item>
-              <Menu.Item icon={<SendOutlined />} key="3">
+              <Menu.Item icon={<SendOutlined />} key="/home/publish">
                 <Link to={'/home/publish'}> 发布文章</Link>
               </Menu.Item>
             </Menu>

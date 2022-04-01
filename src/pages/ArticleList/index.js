@@ -11,6 +11,7 @@ import {
   Tag,
   Space
 } from 'antd'
+import { SearchOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 import { articleStatus } from 'api/constant'
 import { getChannels } from 'api/channel'
@@ -55,7 +56,10 @@ export const ArticleList = () => {
     {
       title: '状态',
       dataIndex: 'status',
-      key: 'status'
+      render: (tag) => {
+        const { name, color } = articleStatus.find((item) => item.id === tag)
+        return <Tag color={color}>{name}</Tag>
+      }
     },
     {
       title: '发布时间',
@@ -75,14 +79,30 @@ export const ArticleList = () => {
     },
     {
       title: '操作',
-      dataIndex: 'actions'
+      render() {
+        return (
+          <Space>
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<SearchOutlined />}
+            ></Button>
+            <Button
+              type="danger"
+              shape="circle"
+              icon={<DeleteOutlined />}
+            ></Button>
+          </Space>
+        )
+      }
     }
   ]
 
   const onFinish = () => {}
   // const handleChange = () => {}
 
-  const { total_count, results } = state.articles
+  const { total_count, results, per_page, page } = state.articles
+  
   return (
     <div>
       <Card
@@ -128,7 +148,17 @@ export const ArticleList = () => {
       </Card>
 
       <Card title={`根据筛选条件共查询到${total_count}条结`}>
-        <Table rowKey={'id'} columns={columns} dataSource={results}></Table>
+        <Table
+          rowKey={'id'}
+          columns={columns}
+          pagination={{
+            total: total_count,
+            position: ['bottomCenter'],
+            pageSize: per_page,
+            current: page
+          }}
+          dataSource={results}
+        ></Table>
       </Card>
     </div>
   )

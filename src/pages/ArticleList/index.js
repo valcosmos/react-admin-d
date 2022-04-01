@@ -18,10 +18,35 @@ import { getArticles } from 'api/articles'
 
 export const ArticleList = () => {
   const [state, setState] = useState({ status: -1, channels: [], articles: [] })
+  const _getChannel = async () => {
+    const res = await getChannels()
+    setState({ ...state, channels: res.data.channels })
+  }
+  const _getArticles = async () => {
+    const res = await getArticles()
+    console.log(res)
+    setState({ ...state, articles: res.data })
+  }
+  useEffect(() => {
+    _getChannel()
+    _getArticles()
+  }, [])
   const columns = [
     {
       title: '封面',
-      dataIndex: 'name'
+      dataIndex: 'cover',
+      render: (data) => {
+        if (data.type === 0) {
+          return <span>no cover</span>
+        }
+        return (
+          <img
+            src={data.images[0]}
+            alt="unknown error"
+            style={{ width: '100px', height: '50px', objectFit: 'cover' }}
+          />
+        )
+      }
     },
     {
       title: '标题',
@@ -50,51 +75,12 @@ export const ArticleList = () => {
     },
     {
       title: '操作',
-      dataIndex: 'actions',
-      
-    }
-  ]
-
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer']
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser']
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher']
+      dataIndex: 'actions'
     }
   ]
 
   const onFinish = () => {}
   // const handleChange = () => {}
-
-  const _getChannel = async () => {
-    const res = await getChannels()
-    setState({ ...state, channels: res.data.channels })
-  }
-  const _getArticles = async () => {
-    const res = await getArticles()
-    console.log(res)
-    setState({ ...state, articles: res.data })
-  }
-  useEffect(() => {
-    _getChannel()
-    _getArticles()
-  }, [])
 
   const { total_count, results } = state.articles
   return (
@@ -142,7 +128,7 @@ export const ArticleList = () => {
       </Card>
 
       <Card title={`根据筛选条件共查询到${total_count}条结`}>
-        <Table columns={columns} dataSource={results}></Table>
+        <Table rowKey={'id'} columns={columns} dataSource={results}></Table>
       </Card>
     </div>
   )

@@ -71,7 +71,7 @@ const LayoutComponent = (props) => {
               </Menu.Item>
             </Menu>
           </Layout.Sider>
-          <Layout style={{ padding: '24px' }}>
+          <Layout style={{ padding: '24px'}}>
             <Layout.Content className="content">
               <Outlet />
             </Layout.Content>

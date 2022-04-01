@@ -1,4 +1,4 @@
-import React, { useState, componentDidMount, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import style from './index.module.scss'
 import { Layout, Menu, Popconfirm, Button, message } from 'antd'
 import {
@@ -25,7 +25,6 @@ const LayoutComponent = (props) => {
   }
   const getFile = async () => {
     const res = await getUserProfile()
-    console.log(res)
     setState({
       profile: res.data
     })

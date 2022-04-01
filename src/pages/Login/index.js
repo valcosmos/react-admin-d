@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, {  useState } from 'react'
 import { Card, Form, Input, Checkbox, Button, message } from 'antd'
 import style from './index.module.scss'
 import { login } from 'api/user'
 import { useNavigate } from 'react-router'
-import { setToken } from 'utils/storage'
+
 import { useAuth } from 'components/AuthRoute/AuthProvider'
 
 export const Login = () => {

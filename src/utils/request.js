@@ -1,9 +1,9 @@
 import { message } from 'antd'
 import axios from 'axios'
-import { Navigate, Location, useNavigate } from 'react-router-dom'
-import { getToken, hasToken, removeToken } from './storage'
+
+import { getToken, hasToken } from './storage'
 import history from './history'
-import { useAuth } from 'components/AuthRoute/AuthProvider'
+
 
 const instance = axios.create({
   baseURL: 'http://geek.itheima.net/v1_0',
@@ -22,7 +22,6 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    console.log(history)
     return response.data
   },
   (err) => {

@@ -4,7 +4,6 @@ import axios from 'axios'
 import { getToken, hasToken } from './storage'
 import history from './history'
 
-
 const instance = axios.create({
   baseURL: 'http://geek.itheima.net/v1_0',
   timeout: 5000
@@ -25,8 +24,14 @@ instance.interceptors.response.use(
     return response.data
   },
   (err) => {
+    if (!err.response) {
+      // 网络超时
+      message.error('网络繁忙，请稍后重试')
+      return Promise.reject('网络繁忙，请稍后重试')
+    }
+
     // 如果token过期
-    if (err.response.status === 401) {
+    if (err.response?.status === 401) {
       // 删除
       // removeToken()
       message.warn('登陆信息过期')

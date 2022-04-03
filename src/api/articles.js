@@ -7,3 +7,5 @@ export const getArticles = (params) => {
     params
   })
 }
+
+export const delArticle = (id) => request.delete(`/mp/articles/${id}`)

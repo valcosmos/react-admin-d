@@ -5,33 +5,59 @@ import {
   Form,
   Radio,
   Button,
-  Select,
   DatePicker,
   Table,
   Tag,
-  Space
+  Space,
+  Modal,
+  message
 } from 'antd'
-import { SearchOutlined, DeleteOutlined } from '@ant-design/icons'
+import {
+  SearchOutlined,
+  DeleteOutlined,
+  ExclamationCircleOutlined
+} from '@ant-design/icons'
 import { Link } from 'react-router-dom'
 import { articleStatus } from 'api/constant'
-import { getChannels } from 'api/channel'
-import { getArticles } from 'api/articles'
 
+import { delArticle, getArticles } from 'api/articles'
+import { Channel } from 'components/Channels'
 export const ArticleList = () => {
-  const [state, setState] = useState({ status: -1, channels: [], articles: [] })
-  const _getChannel = async () => {
-    const res = await getChannels()
-    setState({ ...state, channels: res.data.channels })
+  // const [state, setState] = useState({ status: -1, channels: [], articles: [] })
+  const [status, setStatus] = useState(-1)
+  const [articles, setArticles] = useState([])
+
+  const state = {
+    status
   }
+  // 用于存放查询文章列表的所有参数
+  const reqParams = {
+    page: 1,
+    per_page: 10
+  }
+
   const _getArticles = async () => {
-    const res = await getArticles()
-    console.log(res)
-    setState({ ...state, articles: res.data })
+    const res = await getArticles(reqParams)
+    setArticles(res.data)
   }
   useEffect(() => {
-    _getChannel()
     _getArticles()
   }, [])
+
+  const handleDelete = (id) => {
+    Modal.confirm({
+      title: '温馨提示',
+      icon: <ExclamationCircleOutlined />,
+      content: '您确认删除这篇文章',
+      onOk: async () => {
+        // 发送请求 删除文章
+        await delArticle(id)
+        _getArticles()
+        message.success('删除成功')
+      },
+      onCancel: () => {}
+    })
+  }
   const columns = [
     {
       title: '封面',
@@ -79,7 +105,7 @@ export const ArticleList = () => {
     },
     {
       title: '操作',
-      render() {
+      render(data) {
         return (
           <Space>
             <Button
@@ -91,6 +117,7 @@ export const ArticleList = () => {
               type="danger"
               shape="circle"
               icon={<DeleteOutlined />}
+              onClick={() => handleDelete(data.id)}
             ></Button>
           </Space>
         )
@@ -98,11 +125,41 @@ export const ArticleList = () => {
     }
   ]
 
-  const onFinish = () => {}
+  const onFinish = ({ status, channel_id, date }) => {
+    if (status !== -1) {
+      reqParams.status = status
+    } else {
+      delete reqParams.status
+    }
+    if (channel_id !== undefined) {
+      reqParams.channel_id = channel_id
+    } else {
+      delete reqParams.channel_id
+    }
+    if (date) {
+      reqParams.begin_pubdate = date[0]
+        .startOf('d')
+        .format('YYYY-MM-DD HH:mm:ss')
+      reqParams.end_pubdate = date[1].endOf('d').format('YYYY-MM-DD HH:mm:ss')
+    } else {
+      delete reqParams.begin_pubdate
+      delete reqParams.end_pubdate
+    }
+    // 查询之后 要让页码变成1
+    console.log(reqParams)
+    reqParams.page = 1
+    _getArticles(reqParams)
+  }
   // const handleChange = () => {}
 
-  const { total_count, results, per_page, page } = state.articles
-  
+  const onChange = (page, pageSize) => {
+    reqParams.page = page
+    reqParams.per_page = pageSize
+    _getArticles()
+  }
+
+  const { total_count, results, per_page, page } = articles
+
   return (
     <div>
       <Card
@@ -127,15 +184,9 @@ export const ArticleList = () => {
           </Form.Item>
 
           <Form.Item label="频道" name="channel_id">
-            <Select style={{ width: 200 }} placeholder="请选择频道">
-              {state.channels.map((item) => (
-                <Select.Option key={item.id} value={item.id}>
-                  {item.name}
-                </Select.Option>
-              ))}
-            </Select>
+            <Channel></Channel>
           </Form.Item>
-          <Form.Item label="日期" name="">
+          <Form.Item label="日期" name="date">
             <DatePicker.RangePicker />
           </Form.Item>
 
@@ -155,7 +206,8 @@ export const ArticleList = () => {
             total: total_count,
             position: ['bottomCenter'],
             pageSize: per_page,
-            current: page
+            current: page,
+            onChange
           }}
           dataSource={results}
         ></Table>

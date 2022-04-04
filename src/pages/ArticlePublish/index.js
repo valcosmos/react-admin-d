@@ -16,12 +16,28 @@ import { Channel } from 'components/Channels'
 
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
+import { baseURL } from 'utils/request'
 
 export const ArticlePublish = () => {
+  const [type, setType] = useState(1)
+  // 用于控制上传的额图片以及图片的显示
+  const [fileList, setFileList] = useState([])
+
   const onFinish = (values) => {
     console.log(values)
   }
   const [value, setValue] = useState('')
+
+  const changeType = (e) => {
+    // setType()
+    const value = e.target.value
+    setType(value)
+  }
+
+  const uploadOnChange = ({ fileList }) => {
+    console.log(fileList)
+    setFileList(fileList)
+  }
   return (
     <div className={style.root}>
       <Card
@@ -39,7 +55,7 @@ export const ArticlePublish = () => {
           size="large"
           onFinish={onFinish}
           validateTrigger={['onBlur', 'onChange']}
-          initialValues={{ title: '', channel_id: '', content: '' }}
+          initialValues={{ title: '', channel_id: '', content: '', type }}
         >
           <Form.Item
             label={'标题'}
@@ -56,16 +72,23 @@ export const ArticlePublish = () => {
             <Channel></Channel>
           </Form.Item>
           <Form.Item label={'封面'} name="type">
-            <Radio.Group>
+            <Radio.Group onChange={changeType}>
               <Radio value={1}>单图</Radio>
               <Radio value={3}>三图</Radio>
               <Radio value={0}>无图</Radio>
             </Radio.Group>
           </Form.Item>
           <Form.Item wrapperCol={{ offset: 4 }}>
-            <Upload name="avatar" listType="picture-card">
-              <PlusOutlined />
-            </Upload>
+            {type !== 0 && (
+              <Upload
+                name="image"
+                listType="picture-card"
+                action={`${baseURL}/upload`}
+                onChange={uploadOnChange}
+              >
+                <PlusOutlined />
+              </Upload>
+            )}
           </Form.Item>
           <Form.Item
             label={'内容'}

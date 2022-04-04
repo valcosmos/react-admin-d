@@ -8,7 +8,8 @@ import {
   Space,
   Input,
   Radio,
-  Upload
+  Upload,
+  Modal
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
@@ -23,20 +24,32 @@ export const ArticlePublish = () => {
   // 用于控制上传的额图片以及图片的显示
   const [fileList, setFileList] = useState([])
 
+  const [previewVisible, setPreviewVisible] = useState(false)
+
+  const [previewUrl, setPreviewUrl] = useState('')
+
   const onFinish = (values) => {
     console.log(values)
   }
-  const [value, setValue] = useState('')
 
   const changeType = (e) => {
-    // setType()
     const value = e.target.value
     setType(value)
+    setFileList([])
   }
 
   const uploadOnChange = ({ fileList }) => {
     console.log(fileList)
     setFileList(fileList)
+  }
+  const uploadOnPreview = (file) => {
+    console.log(file)
+    setPreviewVisible(true)
+    setPreviewUrl(file.response.data.url)
+  }
+
+  const handleCancel = () => {
+    setPreviewVisible(false)
   }
   return (
     <div className={style.root}>
@@ -55,7 +68,7 @@ export const ArticlePublish = () => {
           size="large"
           onFinish={onFinish}
           validateTrigger={['onBlur', 'onChange']}
-          initialValues={{ title: '', channel_id: '', content: '', type }}
+          initialValues={{ title: '', content: '', type }}
         >
           <Form.Item
             label={'标题'}
@@ -85,8 +98,9 @@ export const ArticlePublish = () => {
                 listType="picture-card"
                 action={`${baseURL}/upload`}
                 onChange={uploadOnChange}
+                onPreview={uploadOnPreview}
               >
-                <PlusOutlined />
+                {fileList.length < type && <PlusOutlined />}
               </Upload>
             )}
           </Form.Item>
@@ -109,6 +123,15 @@ export const ArticlePublish = () => {
           </Form.Item>
         </Form>
       </Card>
+      {/* 用于显示预览 */}
+      <Modal
+        visible={previewVisible}
+        title={'图片预览'}
+        footer={null}
+        onCancel={handleCancel}
+      >
+        <img alt="example" style={{ width: '100%' }} src={previewUrl} />
+      </Modal>
     </div>
   )
 }

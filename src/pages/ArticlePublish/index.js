@@ -9,7 +9,8 @@ import {
   Input,
   Radio,
   Upload,
-  Modal
+  Modal,
+  message
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
@@ -23,34 +24,55 @@ export const ArticlePublish = () => {
   const [type, setType] = useState(1)
   // 用于控制上传的额图片以及图片的显示
   const [fileList, setFileList] = useState([])
-
+  // 封面预览
   const [previewVisible, setPreviewVisible] = useState(false)
-
+  // 预览地址
   const [previewUrl, setPreviewUrl] = useState('')
 
   const onFinish = (values) => {
     console.log(values)
+    console.log(fileList)
   }
 
+  // 修改封面
   const changeType = (e) => {
     const value = e.target.value
     setType(value)
     setFileList([])
   }
 
+  // 图片上传的回调
   const uploadOnChange = ({ fileList }) => {
     console.log(fileList)
     setFileList(fileList)
   }
+  // 图片上传预览
   const uploadOnPreview = (file) => {
     console.log(file)
     setPreviewVisible(true)
-    setPreviewUrl(file.response.data.url)
+    setPreviewUrl(file.url || file.response.data.url)
   }
 
+  // 图片预览modal关闭
   const handleCancel = () => {
     setPreviewVisible(false)
   }
+
+  // 图片上传前校验
+  const beforeUpload = (file) => {
+    console.log(file)
+    // 判断图片不能超过500k
+    if (file.size >= 1024 * 500) {
+      message.warn('上传文件不能超过500k')
+      return Upload.LIST_IGNORE
+    }
+    if (!['image/png', 'image/jpeg'].includes(file.type)) {
+      message.warn('只能上传png或者jpg格式的图片')
+      return Upload.LIST_IGNORE
+    }
+    return true
+  }
+
   return (
     <div className={style.root}>
       <Card
@@ -99,6 +121,7 @@ export const ArticlePublish = () => {
                 action={`${baseURL}/upload`}
                 onChange={uploadOnChange}
                 onPreview={uploadOnPreview}
+                beforeUpload={beforeUpload}
               >
                 {fileList.length < type && <PlusOutlined />}
               </Upload>

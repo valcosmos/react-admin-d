@@ -19,6 +19,8 @@ import { Channel } from 'components/Channels'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { baseURL } from 'utils/request'
+import { addArticles } from 'api/articles'
+import history from 'utils/history'
 
 export const ArticlePublish = () => {
   const [type, setType] = useState(1)
@@ -29,9 +31,25 @@ export const ArticlePublish = () => {
   // 预览地址
   const [previewUrl, setPreviewUrl] = useState('')
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     console.log(values)
     console.log(fileList)
+    if (fileList.length !== type) {
+      return message.warning('图片上传数量不正确')
+    }
+
+    const images = fileList.map((item) => item.url || item.response.data.url)
+    // 添加文章
+    const res = await addArticles({
+      ...values,
+      cover: {
+        type,
+        images
+      }
+    })
+    console.log(res)
+    message.success('添加成功')
+    history.push('/home/list')
   }
 
   // 修改封面

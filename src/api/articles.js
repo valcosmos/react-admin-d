@@ -9,3 +9,5 @@ export const getArticles = (params) => {
 }
 
 export const delArticle = (id) => request.delete(`/mp/articles/${id}`)
+
+export const addArticles = (data) => request.post('/mp/articles', data)

@@ -1,6 +1,6 @@
 import { Result, Button } from 'antd'
 
-export const NotFound = () => (
+const NotFound = () => (
   <Result
     status="404"
     title="404"
@@ -8,3 +8,5 @@ export const NotFound = () => (
     extra={<Button type="primary">Back Home</Button>}
   />
 )
+
+export default NotFound

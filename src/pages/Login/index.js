@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router'
 
 import { useAuth } from 'components/AuthRoute/AuthProvider'
 
-export const Login = () => {
+ const Login = () => {
   const navigate = useNavigate()
   const auth = useAuth()
   const [loading, setLoading] = useState(false)
@@ -102,3 +102,6 @@ export const Login = () => {
     </div>
   )
 }
+
+
+export default Login

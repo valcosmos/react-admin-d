@@ -12,17 +12,24 @@ import {
   Modal,
   message
 } from 'antd'
+
 import {
-  SearchOutlined,
+  EditOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons'
+
 import { Link } from 'react-router-dom'
+
 import { articleStatus } from 'api/constant'
 
 import { delArticle, getArticles } from 'api/articles'
+
 import { Channel } from 'components/Channels'
-export const ArticleList = () => {
+
+import history from 'utils/history'
+
+ const ArticleList = () => {
   // const [state, setState] = useState({ status: -1, channels: [], articles: [] })
   const [status, setStatus] = useState(-1)
   const [articles, setArticles] = useState([])
@@ -111,7 +118,8 @@ export const ArticleList = () => {
             <Button
               type="primary"
               shape="circle"
-              icon={<SearchOutlined />}
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(data.id)}
             ></Button>
             <Button
               type="danger"
@@ -124,6 +132,11 @@ export const ArticleList = () => {
       }
     }
   ]
+
+  const handleEdit = (id) => {
+    // console.log(id)
+    history.push(`/home/publish/${id}`)
+  }
 
   const onFinish = ({ status, channel_id, date }) => {
     if (status !== -1) {
@@ -215,3 +228,5 @@ export const ArticleList = () => {
     </div>
   )
 }
+
+export default ArticleList

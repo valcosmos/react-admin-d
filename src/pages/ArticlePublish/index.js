@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import style from './index.module.scss'
 import {
   Card,
@@ -13,16 +13,16 @@ import {
   message
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { Channel } from 'components/Channels'
 
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { baseURL } from 'utils/request'
-import { addArticles } from 'api/articles'
+import { addArticles, getArticleById, updateArticles } from 'api/articles'
 import history from 'utils/history'
 
-export const ArticlePublish = () => {
+const ArticlePublish = () => {
   const [type, setType] = useState(1)
   // 用于控制上传的额图片以及图片的显示
   const [fileList, setFileList] = useState([])
@@ -31,25 +31,76 @@ export const ArticlePublish = () => {
   // 预览地址
   const [previewUrl, setPreviewUrl] = useState('')
 
-  const onFinish = async (values) => {
-    console.log(values)
-    console.log(fileList)
+  const { id } = useParams()
+  console.log(id)
+
+  const getArticle = async () => {
+    if (id) {
+      const res = await getArticleById(id)
+
+      const values = {
+        ...res.data,
+        type: res.data.cover.type
+      }
+      // 表单设置value值
+      formRef.current.setFieldsValue(values)
+      // 给图片回显
+      setFileList(res.data.cover.images.map((item) => ({ url: item })))
+
+      setType(res.data.cover.type)
+    }
+  }
+  useEffect(() => {
+    getArticle()
+  }, [])
+
+  const formRef = useRef()
+
+  const save = async (values, draft) => {
     if (fileList.length !== type) {
       return message.warning('图片上传数量不正确')
     }
-
     const images = fileList.map((item) => item.url || item.response.data.url)
-    // 添加文章
-    const res = await addArticles({
-      ...values,
-      cover: {
-        type,
-        images
-      }
-    })
-    console.log(res)
-    message.success('添加成功')
+
+    if (id) {
+      // 更新
+      await updateArticles(
+        {
+          ...values,
+          cover: {
+            type,
+            images
+          },
+          id
+        },
+        draft
+      )
+    } else {
+      // 添加文章
+
+      await addArticles(
+        {
+          ...values,
+          cover: {
+            type,
+            images
+          }
+        },
+        draft
+      )
+    }
+
+    message.success(`${id ? '修改' : '添加'}成功`)
     history.push('/home/list')
+  }
+
+  const onFinish = async (values) => {
+    save(values, false)
+  }
+
+  const addDraft = async () => {
+    const values = await formRef.current.validateFields()
+    save(values, true)
   }
 
   // 修改封面
@@ -99,11 +150,12 @@ export const ArticlePublish = () => {
             <Breadcrumb.Item>
               <Link to={'/home'}>首页</Link>
             </Breadcrumb.Item>
-            <Breadcrumb.Item>发布文章</Breadcrumb.Item>
+            <Breadcrumb.Item>{id ? '编辑' : '发布'}文章</Breadcrumb.Item>
           </Breadcrumb>
         }
       >
         <Form
+          ref={formRef}
           labelCol={{ span: 4 }}
           size="large"
           onFinish={onFinish}
@@ -137,6 +189,7 @@ export const ArticlePublish = () => {
                 name="image"
                 listType="picture-card"
                 action={`${baseURL}/upload`}
+                fileList={fileList}
                 onChange={uploadOnChange}
                 onPreview={uploadOnPreview}
                 beforeUpload={beforeUpload}
@@ -157,7 +210,7 @@ export const ArticlePublish = () => {
               <Button size="large" type="primary" htmlType="submit">
                 发布文章
               </Button>
-              <Button size="large" htmlType="submit">
+              <Button size="large" onClick={addDraft}>
                 存入草稿
               </Button>
             </Space>
@@ -176,3 +229,5 @@ export const ArticlePublish = () => {
     </div>
   )
 }
+
+export default ArticlePublish

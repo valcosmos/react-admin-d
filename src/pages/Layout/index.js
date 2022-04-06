@@ -13,10 +13,20 @@ import { getUserProfile } from 'api/user'
 
 const LayoutComponent = (props) => {
   const use = useLocation()
-
+  const [selectKey, setSelectKey] = useState(use.pathname)
+  useEffect(() => {
+    if (use.pathname && use.pathname !== selectKey) {
+      setSelectKey(
+        use.pathname.startsWith('/home/publish')
+          ? '/home/publish'
+          : use.pathname
+      )
+    }
+  }, [use.pathname])
   const [state, setState] = useState({
     profile: {}
   })
+
   const nav = useNavigate()
   const onConfirm = () => {
     removeToken()
@@ -57,7 +67,7 @@ const LayoutComponent = (props) => {
             <Menu
               mode="inline"
               theme="dark"
-              defaultSelectedKeys={use.pathname}
+              selectedKeys={[selectKey]}
               style={{ height: '100%', borderRight: 0 }}
             >
               <Menu.Item icon={<DatabaseOutlined />} key="/home">
@@ -71,7 +81,7 @@ const LayoutComponent = (props) => {
               </Menu.Item>
             </Menu>
           </Layout.Sider>
-          <Layout style={{ padding: '24px'}}>
+          <Layout style={{ padding: '24px' }}>
             <Layout.Content className="content">
               <Outlet />
             </Layout.Content>

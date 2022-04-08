@@ -1,4 +1,4 @@
-import React, {  useState } from 'react'
+import React, { useState } from 'react'
 import { Card, Form, Input, Checkbox, Button, message } from 'antd'
 import style from './index.module.scss'
 import { login } from 'api/user'
@@ -6,21 +6,21 @@ import { useNavigate } from 'react-router'
 
 import { useAuth } from 'components/AuthRoute/AuthProvider'
 
- const Login = () => {
+const Login = () => {
   const navigate = useNavigate()
   const auth = useAuth()
   const [loading, setLoading] = useState(false)
 
   const onFinish = async (values) => {
-    console.log('Success:', values)
+    // console.log('Success:', values)
     setLoading(true)
     const { mobile, code } = values
+
     try {
       const { data } = await login(mobile, code)
+      message.success('登陆成功')
+      setLoading(false)
       auth.signin(data.token, () => navigate('/home', { replace: true }))
-      message.success('登陆成功', 1, () => {
-        setLoading(false)
-      })
     } catch (err) {
       message.error(err.response.data.message, 1, () => {
         setLoading(false)
@@ -102,6 +102,5 @@ import { useAuth } from 'components/AuthRoute/AuthProvider'
     </div>
   )
 }
-
 
 export default Login
